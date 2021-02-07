@@ -1,79 +1,79 @@
 //Description: Code to actively stabilize an airplane with elevons.
 //             The angle of attack is measure with a potentiometer attached to a weathervane.        
 
-//---- Libraries ----
+//============ Libraries ============
 #include <PinChangeInterrupt.h>
 #include <Servo.h>
 
 
-//---- Constants ----
+//============ Constants ============
 
   //-- Potentiometer (angle of attack) sensor:
-const int POT_PIN 				= A7;
+const int POT_PIN               = A7;
 
     //Calibration:
-const int POT_MID 				= 500 + 10; // Increase offset for greater AoA - more pitch up [ Note: AoA  vane gets moved due to prop wash]
-const int POT_CHANGE 			= 400;
-const int POT_DEADBAND 			= 0;
+const int POT_MID               = 500 + 10; // Increase offset for greater AoA - more pitch up [ Note: AoA  vane gets moved due to prop wash]
+const int POT_CHANGE            = 400;
+const int POT_DEADBAND          = 0;
 
     //Stabilization PID coefficients:
-const float POT_GAIN_PROP 		= -2.5; 	// flight appears stable at higher settings [increase?]
-const float POT_GAIN_DERIV 		= -0.2; 	//Induces wobble at speed
-const float POT_GAIN_INT 		= -0.0;		//Integral gain induces delayed control - No major stability improvement
-const float POT_DECAY_INT 		= 0.005;
-const float RX_INT_DEADBAND 	= 2;
+const float POT_GAIN_PROP       = -2.5;     // flight appears stable at higher settings [increase?]
+const float POT_GAIN_DERIV      = -0.2;     //Induces wobble at speed
+const float POT_GAIN_INT        = -0.0;     //Integral gain induces delayed control - No major stability improvement
+const float POT_DECAY_INT       = 0.005;
+const float RX_INT_DEADBAND     = 2;
 
   //-- Input and Output PWM signals:
-const int PWM_CHANGE 			= 550;
-const int PWM_MID 				= 1500;
+const int PWM_CHANGE            = 550;
+const int PWM_MID               = 1500;
 
   //-- Finite Impulse Response filter coefficients:
     //Updating data:
-const int REFRESH_DELAY 		= 10;
-const float SENS_DECAY 			= 0.4;
-const int N_FILTER 				= 2;
-const float INFINITESIMAL 		= float(REFRESH_DELAY)/1000.0;
+const int REFRESH_DELAY         = 10;
+const float SENS_DECAY          = 0.4;
+const int N_FILTER              = 2;
+const float INFINITESIMAL       = float(REFRESH_DELAY)/1000.0;
 
     //Time Derivative:
-const float COEFF_DERIV[] 		= {1, 6, 14, 14, 0, -14, -14, -6, -1};       
-const float DENOM_DERIV 		= INFINITESIMAL * 128 ;     
-const int N_DERIV 				= sizeof( COEFF_DERIV )/sizeof( COEFF_DERIV[0] );
+const float COEFF_DERIV[]       = {1, 6, 14, 14, 0, -14, -14, -6, -1};       
+const float DENOM_DERIV         = INFINITESIMAL * 128 ;     
+const int N_DERIV               = sizeof( COEFF_DERIV )/sizeof( COEFF_DERIV[0] );
     
   //-- Miscellaneous:
     //Indeces:
 const int PITCH = 1;
-const int ROLL 	= 0;
-const int NOW 	= 0;
-const int PAST 	= 1;
+const int ROLL  = 0;
+const int NOW   = 0;
+const int PAST  = 1;
 
   //Servo output signals:
-const int PIN_LEFT 	= 4;
+const int PIN_LEFT  = 4;
 const int PIN_RIGHT = 5;
 const int TRIM_LEFT = 0;
 const int TRIM_RIGHT = 0;
 
   //-- Receiver PWM inputs:
     //Filtering:
-const int RX_INPUT_DEADBAND 	= 4;
-const float RX_INPUT_DECAY 		= 0.4;
-const float RX_INPUT_GAIN[] 	= {0.5 , 0.7};
+const int RX_INPUT_DEADBAND     = 4;
+const float RX_INPUT_DECAY      = 0.4;
+const float RX_INPUT_GAIN[]     = {0.5 , 0.7};
 
     //Pins:
-const int RX_INPUT_PINS[] 		= {2, 3};
+const int RX_INPUT_PINS[]       = {2, 3};
 const int RX_N_INPUTS = sizeof( RX_INPUT_PINS )/sizeof( RX_INPUT_PINS[0] );
 
     //Input calibration:
-const int RX_CALIB_PASSES 		= 5;
-const float RX_CALIB_COUNT 		= 10;
-const int RX_CALIB_DELAY 		= 20;
+const int RX_CALIB_PASSES       = 5;
+const float RX_CALIB_COUNT      = 10;
+const int RX_CALIB_DELAY        = 20;
 
       //Calibration blinking:
-const int LED_DELAY 			= 200;
-const int BLINKS_BEGIN_CALIB 	= 2;
-const int BLINKS_END_CALIB 		= 5;
+const int LED_DELAY             = 200;
+const int BLINKS_BEGIN_CALIB    = 2;
+const int BLINKS_END_CALIB      = 5;
 
 
-//---- Variables ----
+//============ Variables ============
 
   //-- Receiver PWM signals:
 volatile int pwm_raw[RX_N_INPUTS] = {0};
@@ -88,7 +88,7 @@ uint32_t time_last = millis();
 Servo servoLeft, servoRight;
 
 
-//---- Functions ----
+//============ Functions ============
 
   //-- Deadband functions:
 
@@ -223,7 +223,7 @@ void blinkLed( int n_times ) {
 }
 
 
-//---- Main Functions ----
+//============ Main Functions ============
 
 void setup() {
 
