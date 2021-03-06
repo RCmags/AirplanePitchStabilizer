@@ -14,10 +14,12 @@ For previous projects that inspired this work, please see these links:
 - http://www.charlesriverrc.org/articles/asfwpp/lelke_activepitch.htm
 - https://www.youtube.com/watch?v=JfKrUbJYk74
 
-See the schematic below for the required circuit:
+Schematic of the required circuit:
+
 <img src = "tail_less_circuit_schem.png" width = "90%" height = "90%">
 
 Finally, here is an example of the kind of aircraft this code was writen for:
+
 <img src = "/example_pictures/top_view_res.jpg" width = "30%" height = "30%"> <img src = "/example_pictures/front_view_res.jpg" width = "30%" height = "30%"> <img src = "/example_pictures/side_view_res.jpg" width = "30%" height = "30%">
 
 
