@@ -6,13 +6,13 @@ The simplest angle-of-attack sensor is a simple low-friction potentiometer attac
 The program is designed to receive 2 PWM inputs from an RC receiver and an analog signal, and outputs two PWM signals for two servos. It is assumed the aircraft is controlled with two elevons. It was written for an Arduino Nano but it should be compatible with other boards. It requires the "PinChageInterrupt" library found here:
 
   https://www.arduino.cc/reference/en/libraries/pinchangeinterrupt/
+  
+See the schematic below for the required circuit:
+
+![picture](tail_less_circuit_schem.png)
 
 For previous projects that inspired this work, please see these links:
 
   http://www.charlesriverrc.org/articles/asfwpp/lelke_activepitch.htm
   
   https://www.youtube.com/watch?v=JfKrUbJYk74
-  
-See the schematic below for the required circuit:
-
-![picture](tail_less_circuit_schem.png)
