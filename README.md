@@ -17,7 +17,7 @@ For previous projects that inspired this work, please see these links:
 
 See the schematic below for the required circuit:
 
-<img src = "tail_less_circuit_schem.png" width = "80%" height = "80%">
+<img src = "tail_less_circuit_schem.png" width = "85%" height = "85%">
 
 Finally, here is an example of the kind of aircraft this code was writen for:
 
