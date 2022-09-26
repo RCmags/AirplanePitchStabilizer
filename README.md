@@ -1,4 +1,4 @@
-# TailLessStability
+# AirplanePitchStabilizer
 This Arduino sketch is a servo controller for a tail-less airplane that is stabilized about the pitch-axis with an angle-of-attack sensor. If tuned correctly, the result is an aircraft with a greater lift-to-drag ratio than what is otherwise possible with passive stability.  
 
 To provide this stability enhancement, the code uses the signal an analog A.O.A. sensor as the proportional term of a constant coefficien PID controller. By adjusting the appropriate coefficients, the static and dynamic stability of the aircraft can be greatly enhanced. Due to this excess stability, the center of mass of the vehicle to be moved aft which, in turn, allows for a reduction or complete elimination any reflex in the elevons. This lack of reflects increases the lift-to-drag ratio of the wing compared to a reflexed airfoil.
