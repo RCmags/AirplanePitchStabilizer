@@ -14,9 +14,9 @@
 #define PWM_MAX           2000    // us       // Maximum servo position
                                             
 // 4. Pitch Stabilization
-  // 1. PID Controller
-#define GAIN_PROP         1000.0              // Proportional gain. Adjusts spring response
-#define GAIN_DERIV        50.0                // Derivative gain. Adjusts damping response
+  // 1. PID Controller                        NOTE: Proportional on angular velocity
+#define GAIN_INT          1000.0              // Integral gain. Adjusts spring response
+#define GAIN_PROP         50.0                // Proportional gain. Adjusts damping response
 #define ANGLE_MAX         15      // deg      // Angle at which integral term saturates
   // 2. target rate
 #define ACCEL_MIN         0.2     // g-force  // Minimum allowable wing load. Seen at max down elevator

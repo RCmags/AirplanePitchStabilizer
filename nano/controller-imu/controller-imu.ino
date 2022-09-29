@@ -158,7 +158,7 @@ float PIDcontroller(float input) {
   float angvel = imu.gx() - angvel_t;     
   float angle = integral(angvel);
     // use P and I terms
-  float output = float(GAIN_PROP)*angle + float(GAIN_DERIV)*angvel;
+  float output = float(GAIN_INT)*angle + float(GAIN_PROP)*angvel;
 
   #ifdef USING_WEIGHT_SHIFT
     return output * gainAccel(accel); 
