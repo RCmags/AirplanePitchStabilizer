@@ -2,7 +2,7 @@
 /*=========================================================*/
 // 1. Control inputs [negate to reverse direction]
 #define GAIN_PITCH        0.5               // Change in target angle of attack due pitch commands. 
-#define GAIN_ROLL         0.5               // Asymmetric sweep/ailerons, CH1
+#define GAIN_ROLL         0.5               // Asymmetric sweep, CH1
 
 // 2. Servo trims
 #define TRIM_LEFT         0       // us     // left  wing 

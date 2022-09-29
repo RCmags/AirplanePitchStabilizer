@@ -83,7 +83,7 @@ float readSensor() {
 /* remove noise from analog sensor and calculate derivative */
 void filterSensor(float *xbar, float *dxdt) {
   // store state
-  static uint32_t last_time = millis();
+  static uint32_t last_time = micros();
   static float x[2] = {0}, v = 0;
 
   // time change

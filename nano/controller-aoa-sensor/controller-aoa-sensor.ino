@@ -84,7 +84,7 @@ float readSensor() {
 /* remove noise from analog sensor and calculate derivative */
 void filterSensor(float *xbar, float *dxdt) {
   // store state
-  static uint32_t last_time = millis();
+  static uint32_t last_time = micros();
   static float x[2] = {0}, v = 0;
 
   // time change
@@ -158,8 +158,6 @@ void setup() {
   setupISR();
   setupServos();
   pinMode(SENSOR_PIN, INPUT_PULLUP); // sensor
-
-  Serial.begin(9600);
 }
 
 void loop() {
@@ -179,5 +177,4 @@ void loop() {
 
   servo[0].writeMicroseconds( mix1 );    // left wing
   servo[1].writeMicroseconds( mix2 );    // right wing
-  Serial.println( analogRead(SENSOR_PIN) );
 }
