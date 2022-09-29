@@ -20,8 +20,8 @@
 // Pin A5 -> Sensor SCL
 // Pin A4 -> Sensor SDA
   // Outputs:
-// Pin 4  -> Left  wing servo
-// Pin 5  -> Right wing servo 
+// Pin 6  -> Left  wing servo
+// Pin 7  -> Right wing servo 
 
 //=================== Code ===================
 #include <Servo.h>
@@ -39,7 +39,6 @@ constexpr float ANGVEL_MAX   = (ACCEL_MAX - 1) * ANGVEL_SCALE;
 //----- global variables 
 Servo servo[2]; 
 volatile uint16_t pwm_input[2] = {0};
-int               pwm_mean[2]  = {PWM_MID};
 
 //----- Input signals
 // PORTB = {8 .. 13} -> using pins {8 .. 9} = B00000011
@@ -80,19 +79,22 @@ void setupISR() {
 //----- Input filter
 
 /* average of rx signals */
-void calibrateInputs() {
+int* calibrateInputs() {  
   uint32_t sum[2] = {0};
   for( uint8_t count = 0; count < NUMBER_MEAN; count += 1 ) {
     sum[0] += pwm_input[0];
     sum[1] += pwm_input[1];
     delay(20);                  // period of 50hz pwm signal
-  } 
-  pwm_mean[0] = int(sum[0] / NUMBER_MEAN);
-  pwm_mean[1] = int(sum[1] / NUMBER_MEAN);
+  }
+  static int output[2];         // store value to limit scope
+  output[0] = sum[0] / NUMBER_MEAN;
+  output[1] = sum[1] / NUMBER_MEAN;
+  return output; 
 }
 
 /* scale and center inputs */
 void scaleInputs(float* output) {
+  static int* pwm_mean = calibrateInputs();
   output[0] = float( int(pwm_input[0]) - pwm_mean[0] )*GAIN_ROLL;    // roll
   output[1] = float( int(pwm_input[1]) - pwm_mean[1] )*GAIN_PITCH;   // pitch
 }
@@ -134,16 +136,17 @@ float deadband(float input, const float MIN, const float MAX) {
          input < MIN ? input - MIN : 0;  
 }
 
-/* restrict target rate to restrict wing loading */
+/* limit wing loading */
 float restrictRate(float input, float accel) {
+  // prevent integrator drift
+  input = deadband(input, -INPUT_CHANGE, INPUT_CHANGE);
+  
   // limit target angular velocity
   constexpr float SCALE = (50 * DEG_TO_RAD) / 500.0;     // Convert 500 ms to 50 deg/s
-
-  input = deadband(input, -INPUT_CHANGE, INPUT_CHANGE);
   input *= SCALE;
   input = constrain(input, ANGVEL_MIN, ANGVEL_MAX); 
 
-  // reduce rate at acceleration limits
+  // correct rate at acceleration limits
   accel = deadband(accel, ACCEL_MIN, ACCEL_MAX);
   return input - float(GAIN_ACCEL)*accel;
 }
@@ -170,10 +173,10 @@ float PIDcontroller(float input) {
 //----- Servos
 
 void setupServos() {    
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-  servo[0].attach(4);
-  servo[1].attach(5);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  servo[0].attach(6);
+  servo[1].attach(7);
   // default position
   servo[0].writeMicroseconds(PWM_MID);
   servo[1].writeMicroseconds(PWM_MID);
@@ -187,8 +190,6 @@ void setup() {
   // sensors
   imu.setup();
   imu.setBias();
-  // receiver signals
-  calibrateInputs();
 }
 
 void loop() {

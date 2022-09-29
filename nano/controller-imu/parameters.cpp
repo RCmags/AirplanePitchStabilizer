@@ -25,7 +25,7 @@
 #define GAIN_ACCEL        0.0                 // Load correction gain. Restricts maximum and minimum accelerations
 
 // 5. Input signal filter
-#define INPUT_CHANGE      40      // us       // deadband near center-stick to prevent integrator drift.
+#define INPUT_CHANGE      50      // us       // deadband near center-stick to prevent integrator drift.
 
 // 6. Settings
 #define USING_WEIGHT_SHIFT                    // Uncomment for weight-shift pitch control.  
