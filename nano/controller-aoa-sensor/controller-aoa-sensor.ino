@@ -59,7 +59,7 @@ void setupISR() {
   PCMSK0 |= (1 << PCINT1);
   // set as input
   pinMode(8, INPUT_PULLUP);   
-  pinMode(9, INPUT_PULLUP); ; 
+  pinMode(9, INPUT_PULLUP);
 }
 
 //----- Input filter
@@ -77,8 +77,8 @@ float readSensor() {
   constexpr float SLOPE = float(ANGLE_MAX - ANGLE_MIN) / float(ANALOG_MAX - ANALOG_MIN);
   constexpr int   CONST = float(ANALOG_MAX + ANALOG_MIN)/2 + ANALOG_OFFSET;
   // scale reading
-  float value = analogRead(SENSOR_PIN) - CONST;     
-  return SLOPE*value;
+  int value = analogRead(SENSOR_PIN) - CONST;     
+  return SLOPE*float(value);
 }
 
 /* remove noise from analog sensor and calculate derivative */
@@ -128,7 +128,7 @@ float PIDcontroller(float input) {
   float angle; float angle_deriv; filterSensor(&angle, &angle_deriv);
   
   // desired angle of attack
-  constexpr float SCALE = 5.0 / 500.0;     // Convert 500 ms to 5 degrees
+  constexpr float SCALE = 10.0 / 500.0;     // Convert 500 ms to 10 degrees
   
   float targ_angle = SCALE*input + AOA_TRIM;
   targ_angle = constrain(targ_angle, AOA_MIN, AOA_MAX);
@@ -164,7 +164,12 @@ void loop() {
   // combine inputs
   float input[2]; scaleInputs(input);
   
-  float output = PIDcontroller( -input[1] );  // pitch input controls target AoA
+  #ifdef USING_MANUAL_CONTROL
+    float output = -input[1];                  // directly use rx input
+  #else
+    float output = PIDcontroller( input[1] );  // pitch input controls target AoA
+  #endif
+  
   float mix1 = input[0] + output;
   float mix2 = input[0] - output;
   
@@ -172,8 +177,8 @@ void loop() {
   mix1 += PWM_MID + TRIM_LEFT;
   mix2 += PWM_MID + TRIM_RIGHT;
   
-  mix1 = constrain(mix1, PWM_MIN, PWM_MAX );
-  mix2 = constrain(mix2, PWM_MIN, PWM_MAX );
+  mix1 = constrain(mix1, PWM_MIN, PWM_MAX);
+  mix2 = constrain(mix2, PWM_MIN, PWM_MAX);
 
   servo[0].writeMicroseconds( mix1 );    // left wing
   servo[1].writeMicroseconds( mix2 );    // right wing

@@ -5,18 +5,21 @@
 
 // NOTE: this is intended for the ATTiny85 in the absense of a serial output.
 
-/* Analog Read pinout
+/* Analog Read pinout:
  * Pin | Analog  
+ * ============
  * PB2 |   1  
  * PB3 |   3
  * PB4 |   2
 */
 
-// --- Parameters ----
-#define ANALOG_MAX    850     // maximum target reading
-#define ANALOG_MIN    200     // minimum target reading
-#define ANALOG_DIFF   10      // allowable error in middle position
-#define OFFSET        -50     // bias to make the sensor read zero at zero deflection
+// --- Parameters ---- 
+/* Copy these values into the parameters file of the flight controller */
+           
+#define ANALOG_MAX        410     // Maximum target reading. Measure and record the sensor angle at this value
+#define ANALOG_MIN        90      // Minimum target reading. Measure and record the sensor angle at this value 
+#define ANALOG_DIFF       5       // Allowable error at middle position
+#define ANALOG_OFFSET    -70      // Bias to make the sensor read zero at the wing's zero-lift angle of attack
 
 // depedant constants
 constexpr int ANALOG_MID = 0.5*(ANALOG_MAX + ANALOG_MIN) + OFFSET;
@@ -30,10 +33,10 @@ void setup() {
 }
 
 void loop() {
-  int value = analogRead(1);
+  int value = analogRead(1);    // PB2 -> ADC1
 
-  if( (value < ANALOG_MIN   || value > ANALOG_MAX) ||  
-      (value < ANALOG_MID_P && value > ANALOG_MID_N ) ) {
+  if( (value < ANALOG_MIN || value > ANALOG_MAX) ||  
+      (value < ANALOG_MID_P && value > ANALOG_MID_N) ) {
     digitalWrite(LED_BUILTIN, HIGH);
   } else {
     digitalWrite(LED_BUILTIN, LOW);

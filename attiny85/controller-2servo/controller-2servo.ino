@@ -189,8 +189,8 @@ void loop() {
   mix1 += TRIM_LEFT;
   mix2 += TRIM_RIGHT;
   
-  mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE );
-  mix2 = constrain(mix2, -PWM_CHANGE, PWM_CHANGE )*GAIN_CORRECTION;
+  mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE);
+  mix2 = constrain(mix2, -PWM_CHANGE, PWM_CHANGE)*GAIN_CORRECTION;
 
   servo[0].writeMicroseconds( PWM_MID + mix1 );    // left wing
   servo[1].writeMicroseconds( PWM_MID + mix2 );    // right wing 

@@ -169,6 +169,6 @@ void loop() {
   
   // command servo
   mix += TRIM;
-  mix = constrain(mix, -PWM_CHANGE, PWM_CHANGE );
+  mix = constrain(mix, -PWM_CHANGE, PWM_CHANGE);
   servo.writeMicroseconds( PWM_MID + mix );    
 }
