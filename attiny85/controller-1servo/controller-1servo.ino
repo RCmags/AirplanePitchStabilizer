@@ -11,9 +11,13 @@
 // See included schematic
   // Inputs:
 // Pin 1 -> Receiver CH2
-// Pin 2 -> Analog sensor
+// Pin 2 -> middle of voltage divider 
   // Outputs:
-// Pin 3  -> pitch servo
+// Pin 3 -> pitch servo
+
+/* VOLTAGE DIVIDER is required for analog input */
+/* GND --/\/\/\-- MIDDLE --/\/\/\-- SENSOR_OUT  */
+/*        100K              100K                */
 
 //=================== Code ===================
 #include <Servo_ATTinyCore.h>
@@ -76,8 +80,8 @@ float readSensor() {
   constexpr float SLOPE = float(ANGLE_MAX - ANGLE_MIN) / float(ANALOG_MAX - ANALOG_MIN);
   constexpr int   CONST = float(ANALOG_MAX + ANALOG_MIN)/2 + ANALOG_OFFSET;
   // scale reading
-  float value = analogRead(1) - CONST;      // PB2 -> ADC1 
-  return SLOPE*value;
+  int value = analogRead(1) - CONST;      // PB2 -> ADC1 
+  return SLOPE*float(value);
 }
 
 /* remove noise from analog sensor and calculate derivative */
@@ -127,7 +131,7 @@ float PIDcontroller(float input) {
   float angle; float angle_deriv; filterSensor(&angle, &angle_deriv);
   
   // desired angle of attack
-  constexpr float SCALE = 5.0 / 500.0;     // Convert 500 ms to 5 degrees
+  constexpr float SCALE = 10.0 / 500.0;     // Convert 500 ms to 10 degrees
   
   float targ_angle = SCALE*input + AOA_TRIM;
   targ_angle = constrain(targ_angle, AOA_MIN, AOA_MAX);
@@ -156,10 +160,15 @@ void setup() {
 void loop() {
   // combine inputs
   float input = filterInput();  
-  float mix = PIDcontroller( -input );  // pitch input controls target AoA
 
+  #ifdef USING_MANUAL_CONTROL
+    float mix = -input;
+  #else
+    float mix = PIDcontroller( input );  // pitch input controls target AoA
+  #endif
+  
   // command servo
-  mix += PWM_MID + TRIM;
-  mix = constrain(mix, PWM_MIN, PWM_MAX );
-  servo.writeMicroseconds( mix );    
+  mix += TRIM;
+  mix = constrain(mix, -PWM_CHANGE, PWM_CHANGE );
+  servo.writeMicroseconds( PWM_MID + mix );    
 }

@@ -1,17 +1,17 @@
 /*      CONSTANT     |    VALUE   |  UNIT  |   DESCRIPTION */
 /*=========================================================*/
 // 1. Control inputs [negate to reverse direction]
-#define GAIN_PITCH        0.5               // Change in target angle of attack due pitch commands. 
-#define GAIN_ROLL         0.5               // Asymmetric sweep/ailerons, CH1
+#define GAIN_PITCH        1.0               // Change in target angle of attack due pitch commands. 
+#define GAIN_ROLL         0.6               // Asymmetric sweep/ailerons, CH1
 
 // 2. Servo trims
-#define TRIM_LEFT         0       // us     // left  wing 
-#define TRIM_RIGHT        0       // us     // right wing
-
+#define TRIM_LEFT         80      // us     // left  wing 
+#define TRIM_RIGHT       -80      // us     // right wing
+                                            /* Adjust so the aircraft maintains altitude without rolling or pitching */
 // 3. Output PWM signal
 #define PWM_MID           1500    // us     // Center/middle servo position
-#define PWM_MIN           1000    // us     // Minimum servo position
-#define PWM_MAX           2000    // us     // Maximum servo position
+#define PWM_CHANGE        700     // us     // Maximum change in servo position relative to middle
+#define GAIN_CORRECTION   0.6               // correction factor to make servos move symmetrically
 
 // 4. Signal filters
 #define INPUT_CHANGE      12      // us     // Change in PWM signal needed to update receiver inputs
@@ -19,21 +19,22 @@
                                                A smaller value smoothens the reading at the cost of slower response */
 // 5. Pitch Stabilization
   // 1. PID Controller
-#define GAIN_PROP         40.0              // Proportional gain. Adjusts spring response
-#define GAIN_DERIV        0.0               // Derivative gain. Adjusts damping response
+#define GAIN_PROP         70.0              // Proportional gain. Adjusts spring response
+#define GAIN_DERIV        1.0               // Derivative gain. Adjusts damping response
   // 2. Input restrictions
-#define AOA_TRIM          8.0     // deg    // Target angle of attack in level flight 
-#define AOA_MIN           1.0     // deg    // Minimum target angle of attack. Prevents wings unloading
+#define AOA_TRIM         -1.5     // deg    // Target angle of attack in level flight 
+#define AOA_MIN          -15.0    // deg    // Minimum target angle of attack. Prevents wings unloading
 #define AOA_MAX           15.0    // deg    // Maximum taget angle of attack. Prevents stall
                                             /* NOTE: AOA_MIN < AOA_TRIM < AOA_MAX */
 // 6. Sensor calibrationg
-#define ANGLE_MAX         95      // deg    // Largest deflection of angle sensor 
-#define ANGLE_MIN         -95     // deg    // Smallest deflection of angle sensor
+#define ANGLE_MAX         15      // deg    // Largest deflection of angle sensor 
+#define ANGLE_MIN        -15      // deg    // Smallest deflection of angle sensor
                                             /* NOTE: ANGLE_MIN < ANGLE_MAX */
-#define ANALOG_MAX        750               // AnalogRead output at largest deflection
-#define ANALOG_MIN        250               // AnalogRead output at smallest deflection
-#define ANALOG_OFFSET     220               // Offset to align sensor with zero-lift angle of wing
-
+#define ANALOG_MAX        100               // AnalogRead output at largest deflection
+#define ANALOG_MIN        420               // AnalogRead output at smallest deflection
+#define ANALOG_OFFSET    -35                // Offset to make sensor read zero at zero deflection
+                                            /* Adjust so the servos do not deflect with changes in proportional gain */
 // 7. Settings
 //#define USING_WEIGHT_SHIFT                  // Uncomment for weight-shift pitch control.  
                                             /* Enables gain that modifies pitch corrections with angle of attack */ 
+//#define USING_MANUAL_CONTROL                // Uncomment to dissable pitch stabilization and enable manual inputs

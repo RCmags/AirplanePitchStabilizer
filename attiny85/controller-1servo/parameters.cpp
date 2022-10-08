@@ -8,8 +8,7 @@
 
 // 3. Output PWM signal
 #define PWM_MID           1500    // us     // Center/middle servo position
-#define PWM_MIN           1000    // us     // Minimum servo position
-#define PWM_MAX           2000    // us     // Maximum servo position
+#define PWM_CHANGE        500     // us     // Maximum change in servo position relative to middle
 
 // 4. Signal filters
 #define INPUT_CHANGE      12      // us     // Change in PWM signal needed to update receiver inputs
@@ -26,12 +25,14 @@
                                             /* NOTE: AOA_MIN < AOA_TRIM < AOA_MAX */
 // 6. Sensor calibrationg
 #define ANGLE_MAX         95      // deg    // Largest deflection of angle sensor 
-#define ANGLE_MIN         -95     // deg    // Smallest deflection of angle sensor
+#define ANGLE_MIN        -95      // deg    // Smallest deflection of angle sensor
                                             /* NOTE: ANGLE_MIN < ANGLE_MAX */
-#define ANALOG_MAX        750               // AnalogRead output at largest deflection
-#define ANALOG_MIN        250               // AnalogRead output at smallest deflection
-#define ANALOG_OFFSET     220               // Offset to align sensor with zero-lift angle of wing
+#define ANALOG_MAX        512               // AnalogRead output at largest deflection
+#define ANALOG_MIN        0                 // AnalogRead output at smallest deflection
+#define ANALOG_OFFSET     0                 // Offset to make sensor read zero at zero deflection
+                                            /* Adjust so the servos do not deflect with changes in proportional gain */
 
 // 7. Settings
 //#define USING_WEIGHT_SHIFT                  // Uncomment for weight-shift pitch control.  
                                             /* Enables gain that modifies pitch corrections with angle of attack */ 
+//#define USING_MANUAL_CONTROL                // Uncomment to dissable pitch stabilization and enable manual inputs

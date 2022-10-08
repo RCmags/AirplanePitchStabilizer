@@ -12,10 +12,14 @@
   // Inputs:
 // Pin 0 -> Receiver CH1
 // Pin 1 -> Receiver CH2
-// Pin 2 -> Analog sensor
+// Pin 2 -> middle of voltage divider 
   // Outputs:
-// Pin 3  -> Left  wing servo
-// Pin 4  -> Right wing servo 
+// Pin 3 -> Left  wing servo
+// Pin 4 -> Right wing servo 
+
+/* VOLTAGE DIVIDER is required for analog input */
+/* GND --/\/\/\-- MIDDLE --/\/\/\-- SENSOR_OUT  */
+/*        100K              100K                */
 
 //=================== Code ===================
 #include <Servo_ATTinyCore.h>
@@ -83,10 +87,10 @@ void filterInputs(float* output) {
 /* read sensor and calibrate to degrees */
 float readSensor() {
   constexpr float SLOPE = float(ANGLE_MAX - ANGLE_MIN) / float(ANALOG_MAX - ANALOG_MIN);
-  constexpr int   CONST = float(ANALOG_MAX + ANALOG_MIN)/2 + ANALOG_OFFSET;
+  constexpr int   CONST = (ANALOG_MAX + ANALOG_MIN)/2 + ANALOG_OFFSET;
   // scale reading
-  float value = analogRead(1) - CONST;      // PB2 -> ADC1 
-  return SLOPE*value;
+  int value = analogRead(1) - CONST;      // PB2 -> ADC1 
+  return SLOPE*float(value);
 }
 
 /* remove noise from analog sensor and calculate derivative */
@@ -136,7 +140,7 @@ float PIDcontroller(float input) {
   float angle; float angle_deriv; filterSensor(&angle, &angle_deriv);
   
   // desired angle of attack
-  constexpr float SCALE = 5.0 / 500.0;     // Convert 500 ms to 5 degrees
+  constexpr float SCALE = 10.0 / 500.0;     // Convert 500 ms to 10 degrees
   
   float targ_angle = SCALE*input + AOA_TRIM;
   targ_angle = constrain(targ_angle, AOA_MIN, AOA_MAX);
@@ -171,18 +175,23 @@ void setup() {
 void loop() {
   // combine inputs
   float input[2]; filterInputs(input);
+
+  #ifdef USING_MANUAL_CONTROL
+    float output = -input[1];                  // directly use rx input
+  #else
+    float output = PIDcontroller( input[1] );  // pitch input controls target AoA
+  #endif
   
-  float output = PIDcontroller( -input[1] );  // pitch input controls target AoA
-  float mix1 = input[0] + output;
+  float mix1 = input[0] + output; 
   float mix2 = input[0] - output;
   
-  // command servos
-  mix1 += PWM_MID + TRIM_LEFT;
-  mix2 += PWM_MID + TRIM_RIGHT;
+  // command servo
+  mix1 += TRIM_LEFT;
+  mix2 += TRIM_RIGHT;
   
-  mix1 = constrain(mix1, PWM_MIN, PWM_MAX );
-  mix2 = constrain(mix2, PWM_MIN, PWM_MAX );
+  mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE );
+  mix2 = constrain(mix2, -PWM_CHANGE, PWM_CHANGE )*GAIN_CORRECTION;
 
-  servo[0].writeMicroseconds( mix1 );    // left wing
-  servo[1].writeMicroseconds( mix2 );    // right wing
+  servo[0].writeMicroseconds( PWM_MID + mix1 );    // left wing
+  servo[1].writeMicroseconds( PWM_MID + mix2 );    // right wing 
 }
