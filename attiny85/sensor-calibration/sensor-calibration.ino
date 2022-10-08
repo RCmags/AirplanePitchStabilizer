@@ -43,5 +43,5 @@ void loop() {
   }
 }
 
-/* Note: AnalogRead can saturate at a different value when the code command servos and reads PWM signals.	
+/* Note: AnalogRead can saturate at a different value when the code commands servos and reads PWM signals.	
          Use a voltage divider to scale the signal to a voltage that prevents analogRead from saturating. */
