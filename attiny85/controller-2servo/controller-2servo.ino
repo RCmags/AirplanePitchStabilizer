@@ -177,9 +177,9 @@ void loop() {
   float input[2]; filterInputs(input);
 
   #ifdef USING_MANUAL_CONTROL
-    float output = -input[1];                  // directly use rx input
+    float output = input[1];                    // directly use rx input
   #else
-    float output = PIDcontroller( input[1] );  // pitch input controls target AoA
+    float output = PIDcontroller( -input[1] );  // pitch input controls target AoA
   #endif
   
   float mix1 = input[0] + output; 

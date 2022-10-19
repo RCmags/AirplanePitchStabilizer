@@ -1,11 +1,11 @@
 /*      CONSTANT     |    VALUE   |  UNIT  |   DESCRIPTION */
 /*=========================================================*/
 // 1. Control inputs [negate to reverse]
-#define GAIN_PITCH       -1.0               // Change in target angle of attack due pitch commands 
+#define GAIN_PITCH        1.0               // Change in target angle of attack due pitch commands 
 #define GAIN_ROLL         0.6               // Asymmetric sweep/ailerons
 
 // 2. Servo trims
-#define TRIM_LEFT         20      // us     // left  wing 
+#define TRIM_LEFT         0       // us     // left  wing 
 #define TRIM_RIGHT       -80      // us     // right wing
                                             /* Adjust so the aircraft maintains altitude without rolling or pitching */
 // 3. Output PWM signal
@@ -19,10 +19,10 @@
                                                A smaller value smoothens the reading at the cost of slower response */
 // 5. Pitch Stabilization
   // 1. PID Controller [negate to reverse] 
-#define GAIN_PROP        -70.0              // Proportional gain. Adjusts spring response
+#define GAIN_PROP        -50.0              // Proportional gain. Adjusts spring response
 #define GAIN_DERIV       -1.0               // Derivative gain. Adjusts damping response. Must have same sign as GAIN_PROP
   // 2. Input restrictions
-#define AOA_TRIM          5.5     // deg    // Target angle of attack in level flight 
+#define AOA_TRIM          4.5     // deg    // Target angle of attack in level flight 
 #define AOA_MIN          -15.0    // deg    // Minimum target angle of attack. Prevents wings unloading
 #define AOA_MAX           15.0    // deg    // Maximum taget angle of attack. Prevents stall
                                             /* NOTE: AOA_MIN < AOA_TRIM < AOA_MAX */

@@ -8,9 +8,9 @@
 #define         ADDRESS_A0  LOW         // I2C address from state of A0 pin.  
 
 // Accelerometer offset:
-constexpr int   AX_OFFSET =  552;       // Adjust these values so the accelerometer outputs (0,0,1)g if held level. 
-constexpr int   AY_OFFSET = -241;       // The z-axis must be calibrated for the flight controller to work properly.
-constexpr int   AZ_OFFSET = -3185; 
+constexpr int   AX_OFFSET = 0;       // Adjust these values so the accelerometer outputs (0,0,1)g if held level. 
+constexpr int   AY_OFFSET = 0;       // The z-axis must be calibrated for the flight controller to work properly.
+constexpr int   AZ_OFFSET = 0; 
 
 // Set parameters:
 basicMPU6050<LP_FILTER , GYRO_SENS ,  

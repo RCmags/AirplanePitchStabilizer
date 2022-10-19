@@ -20,8 +20,8 @@
 // Pin A5 -> Sensor SCL
 // Pin A4 -> Sensor SDA
   // Outputs:
-// Pin 6  -> Left  wing servo
-// Pin 7  -> Right wing servo 
+// Pin 2  -> Left  wing servo
+// Pin 3  -> Right wing servo 
 
 //=================== Code ===================
 #include <Servo.h>
@@ -29,8 +29,11 @@
 #include "parameters.cpp"
 
 //----- constants
-#define NUMBER_MEAN    50      // number of readings used for calibration mean
-#define GRAVITY        9.81    // acceleration due to gravity [m/s^2]
+#define PIN_SERVO_LEFT    2
+#define PIN_SERVO_RIGHT   3
+
+#define NUMBER_MEAN       50      // number of readings used for calibration mean
+#define GRAVITY           9.81    // acceleration due to gravity [m/s^2]
 
 constexpr float ANGVEL_SCALE = GRAVITY / VELOCITY;   
 constexpr float ANGVEL_MIN   = (ACCEL_MIN - 1) * ANGVEL_SCALE;
@@ -92,11 +95,28 @@ int* calibrateInputs() {
   return output; 
 }
 
-/* scale and center inputs */
-void scaleInputs(float* output) {
+/* make variable zero within bounds */
+float deadband(float input, const float MIN, const float MAX) {
+  return input > MAX ? input - MAX :
+         input < MIN ? input - MIN : 0;  
+}
+
+/* remove noise from PWM inputs then scale and center */
+void filterInputs(float* output) {
   static int* pwm_mean = calibrateInputs();
-  output[0] = float( int(pwm_input[0]) - pwm_mean[0] )*GAIN_ROLL;    // roll
-  output[1] = float( int(pwm_input[1]) - pwm_mean[1] )*GAIN_PITCH;   // pitch
+  static int filter[2] = {0};  
+  
+  // apply deadband filter
+  for( uint8_t index = 0; index < 2; index += 1 ) {
+    int input = int( pwm_input[index] );
+    int change = input - filter[index]; 
+    filter[index] += deadband(change, -INPUT_CHANGE, INPUT_CHANGE);
+    //filter[index] = change >  INPUT_CHANGE ? input - INPUT_CHANGE :
+    //                change < -INPUT_CHANGE ? input + INPUT_CHANGE : filter[index];
+  }
+  // scale and center inputs
+  output[0] = float( filter[0] - pwm_mean[0] )*GAIN_ROLL;    // roll
+  output[1] = float( filter[1] - pwm_mean[1] )*GAIN_PITCH;   // pitch
 }
 
 //----- PID controller
@@ -130,19 +150,13 @@ float integral(float input) {
   return value[0];
 }
 
-/* make variable zero within bounds */
-float deadband(float input, const float MIN, const float MAX) {
-  return input > MAX ? input - MAX :
-         input < MIN ? input - MIN : 0;  
-}
-
 /* limit wing loading */
 float restrictRate(float input, float accel) {
   // prevent integrator drift
-  input = deadband(input, -INPUT_CHANGE, INPUT_CHANGE);
+  input = deadband(input, -INPUT_DEADBAND, INPUT_DEADBAND);
   
   // limit target angular velocity
-  constexpr float SCALE = (50 * DEG_TO_RAD) / 500.0;     // Convert 500 ms to 50 deg/s
+  constexpr float SCALE = (150 * DEG_TO_RAD) / 500.0;     // Convert 500 ms to 150 deg/s
   input *= SCALE;
   input = constrain(input, ANGVEL_MIN, ANGVEL_MAX); 
 
@@ -152,13 +166,21 @@ float restrictRate(float input, float accel) {
 }
 
 /* PID controller to stabilize pitch axis */
-float PIDcontroller(float input) {
-  // target state
-  float accel = imu.az();                 // z-component aligns with lift
-  float angvel_t = restrictRate(input, accel);
-  
+float PIDcontroller(float input) {  
+  // state 
+  float accel = imu.az();       // acceleration due to lift
+  #ifdef NEGATE_ACCEL
+    accel = -accel;
+  #endif
+
+  float angvel_m = imu.gx();    // pitch-axis rotation
+  #ifdef NEGATE_GYRO
+    angvel_m = -angvel_m;
+  #endif
+ 
   // controller
-  float angvel = imu.gx() - angvel_t;     
+  float angvel_t = restrictRate(input, accel);
+  float angvel = angvel_m - angvel_t;     
   float angle = integral(angvel);
     // use P and I terms
   float output = float(GAIN_INT)*angle + float(GAIN_PROP)*angvel;
@@ -173,10 +195,10 @@ float PIDcontroller(float input) {
 //----- Servos
 
 void setupServos() {    
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-  servo[0].attach(6);
-  servo[1].attach(7);
+  pinMode(PIN_SERVO_LEFT, OUTPUT);
+  pinMode(PIN_SERVO_RIGHT, OUTPUT);
+  servo[0].attach(PIN_SERVO_LEFT);
+  servo[1].attach(PIN_SERVO_RIGHT);
   // default position
   servo[0].writeMicroseconds(PWM_MID);
   servo[1].writeMicroseconds(PWM_MID);
@@ -197,7 +219,7 @@ void loop() {
   imu.updateBias();
   
   // combine inputs
-  float input[2]; scaleInputs(input);
+  float input[2]; filterInputs(input);
   
   float output = PIDcontroller( -input[1] );  
   float mix1 = input[0] + output;
@@ -210,6 +232,6 @@ void loop() {
   mix1 = constrain(mix1, PWM_MIN, PWM_MAX );
   mix2 = constrain(mix2, PWM_MIN, PWM_MAX );
 
-  servo[0].writeMicroseconds( mix1 );    // left wing
+  servo[0].writeMicroseconds( mix1 );    // left wing   
   servo[1].writeMicroseconds( mix2 );    // right wing
 }
