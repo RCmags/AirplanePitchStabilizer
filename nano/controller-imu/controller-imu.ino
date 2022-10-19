@@ -111,8 +111,6 @@ void filterInputs(float* output) {
     int input = int( pwm_input[index] );
     int change = input - filter[index]; 
     filter[index] += deadband(change, -INPUT_CHANGE, INPUT_CHANGE);
-    //filter[index] = change >  INPUT_CHANGE ? input - INPUT_CHANGE :
-    //                change < -INPUT_CHANGE ? input + INPUT_CHANGE : filter[index];
   }
   // scale and center inputs
   output[0] = float( filter[0] - pwm_mean[0] )*GAIN_ROLL;    // roll
