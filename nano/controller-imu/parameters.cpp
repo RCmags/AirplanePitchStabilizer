@@ -2,20 +2,19 @@
 /*=========================================================*/
 // 1. Control inputs [negate to reverse]
 #define GAIN_PITCH        1.0                 // Change in target angle of attack due pitch commands. 
-#define GAIN_ROLL        -0.65                // Asymmetric sweep, CH1
+#define GAIN_ROLL        -0.7                 // Asymmetric sweep, CH1
 
 // 2. Servo trims
 #define TRIM_LEFT         0       // us       // left  wing 
-#define TRIM_RIGHT        0       // us       // right wing
+#define TRIM_RIGHT       -0       // us       // right wing
 
 // 3. Output PWM signal
 #define PWM_MID           1500    // us       // Center/middle servo position
-#define PWM_MIN           1000    // us       // Minimum servo position
-#define PWM_MAX           2000    // us       // Maximum servo position
-                                            
+#define PWM_CHANGE        620     // us       // Maximum change in servo position
+ 
 // 4. Pitch Stabilization
   // 1. PID Controller [negate to reverse]                       
-#define GAIN_INT          1200.0               // Integral gain. Adjusts spring response
+#define GAIN_INT          1200.0              // Integral gain. Adjusts spring response
 #define GAIN_PROP         800.0               // Proportional gain. Adjusts damping response
 #define ANGLE_MAX         25      // deg      // Angle at which integral term saturates
   // 2. target rate                          

@@ -29,9 +29,14 @@
 #include "parameters.cpp"
 
 //----- constants
+  // servos:
 #define PIN_SERVO_LEFT    2
 #define PIN_SERVO_RIGHT   3
 
+constexpr int PWM_MID_L = PWM_MID + TRIM_LEFT;
+constexpr int PWM_MID_R = PWM_MID + TRIM_RIGHT;
+
+  // Angular rate:
 #define NUMBER_MEAN       50      // number of readings used for calibration mean
 #define GRAVITY           9.81    // acceleration due to gravity [m/s^2]
 
@@ -198,8 +203,8 @@ void setupServos() {
   servo[0].attach(PIN_SERVO_LEFT);
   servo[1].attach(PIN_SERVO_RIGHT);
   // default position
-  servo[0].writeMicroseconds(PWM_MID);
-  servo[1].writeMicroseconds(PWM_MID);
+  servo[0].writeMicroseconds(PWM_MID + TRIM_LEFT);
+  servo[1].writeMicroseconds(PWM_MID + TRIM_RIGHT);
 }
 
 //----- Main loop
@@ -223,13 +228,10 @@ void loop() {
   float mix1 = input[0] + output;
   float mix2 = input[0] - output;
   
-  // command servos
-  mix1 += PWM_MID + TRIM_LEFT;
-  mix2 += PWM_MID + TRIM_RIGHT;
-  
-  mix1 = constrain(mix1, PWM_MIN, PWM_MAX );
-  mix2 = constrain(mix2, PWM_MIN, PWM_MAX );
+  // command servos  
+  mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE );
+  mix2 = constrain(mix2, -PWM_CHANGE, PWM_CHANGE );
 
-  servo[0].writeMicroseconds( mix1 );    // left wing   
-  servo[1].writeMicroseconds( mix2 );    // right wing
+  servo[0].writeMicroseconds( PWM_MID_L + mix1 );    // left wing   
+  servo[1].writeMicroseconds( PWM_MID_R + mix2 );    // right wing
 }
