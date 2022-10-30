@@ -3,6 +3,7 @@
 #include <basicMPU6050.h> 
                        
 //----------------------- Settings -------------------------
+
 // Gyro settings:
 #define         LP_FILTER   6           // Low pass filter.                    Value from 0 to 6  -> 5hz cutoff
 #define         GYRO_SENS   1           // Gyro sensitivity.                   Value from 0 to 3  -> +-250 deg/s
