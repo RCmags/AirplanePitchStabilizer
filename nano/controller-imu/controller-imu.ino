@@ -6,10 +6,8 @@
  * 
  * NOTE: 
  * This sketch uses an MPU6050 IMU (gyroscope and accelerometer) to stabilize pitch. It assumes that only 
- * lift and gravity act on the aircraft, and that any external torques are negligible. 
- * 
- * This works for some aircraft, but for a general solution, use the version of the controller that uses 
- * an angle-of-attack sensor. 
+ * lift and gravity act on the aircraft, and that any external torques are negligible. For stability at 
+ * all airspeeds, the wing should have close to no pitching moment.
 */
 
 //=============== Connections ================
@@ -27,14 +25,15 @@
 #include <Servo.h>
 #include "parameters.h"
 #include "imu.h"
+#include "fusion.h"
 
 //----- constants
 constexpr int PWM_MID_L = PWM_MID + TRIM_LEFT;
-constexpr int PWM_MID_R = PWM_MID + TRIM_RIGHT;
+constexpr int PWM_MID_R = PWM_MID - TRIM_RIGHT;
 
 constexpr float ANGVEL_SCALE = GRAVITY / VELOCITY;   
-constexpr float ANGVEL_MIN   = (ACCEL_MIN - 1) * ANGVEL_SCALE;
-constexpr float ANGVEL_MAX   = (ACCEL_MAX - 1) * ANGVEL_SCALE; 
+constexpr float ANGVEL_MIN = (ACCEL_MIN - 1) * ANGVEL_SCALE;
+constexpr float ANGVEL_MAX = (ACCEL_MAX - 1) * ANGVEL_SCALE; 
 
 //----- global variables 
 Servo servo[2]; 
