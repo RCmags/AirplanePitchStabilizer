@@ -25,6 +25,10 @@
 #include <Servo_ATTinyCore.h>
 #include "parameters.cpp"
 
+//----- constants
+constexpr int PWM_MID_L = PWM_MID + TRIM_LEFT;
+constexpr int PWM_MID_R = PWM_MID - TRIM_RIGHT*GAIN_CORRECTION;
+
 //---- global variables 
 Servo servo[2]; 
 volatile uint16_t pwm_input[2] = {0};
@@ -162,6 +166,9 @@ void setupServos() {
   pinMode(PB4, OUTPUT);
   servo[0].attach(PB3);
   servo[1].attach(PB4);
+  // default position
+  servo[0].writeMicroseconds(PWM_MID_L);
+  servo[1].writeMicroseconds(PWM_MID_R);
 }
 
 //----- Main loop
@@ -185,13 +192,10 @@ void loop() {
   float mix1 = input[0] + output; 
   float mix2 = input[0] - output;
   
-  // command servo
-  mix1 += TRIM_LEFT;
-  mix2 += TRIM_RIGHT;
-  
-  mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE);
-  mix2 = constrain(mix2, -PWM_CHANGE, PWM_CHANGE)*GAIN_CORRECTION;
+  // command servo  
+  mix1 = constrain(mix1,-PWM_CHANGE, PWM_CHANGE);
+  mix2 = constrain(mix2,-PWM_CHANGE, PWM_CHANGE)*GAIN_CORRECTION;
 
-  servo[0].writeMicroseconds( PWM_MID + mix1 );    // left wing
-  servo[1].writeMicroseconds( PWM_MID + mix2 );    // right wing 
+  servo[0].writeMicroseconds( PWM_MID_L + mix1 );    // left wing
+  servo[1].writeMicroseconds( PWM_MID_R + mix2 );    // right wing 
 }

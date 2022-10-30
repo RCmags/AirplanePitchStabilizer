@@ -23,6 +23,9 @@
 #include <Servo_ATTinyCore.h>
 #include "parameters.cpp"
 
+//---- constants
+constexpr float PWM_MID_TRIM = PWM_MID + TRIM;
+
 //---- global variables 
 Servo servo; 
 volatile uint16_t pwm_input = 0;
@@ -153,6 +156,7 @@ void setup() {
   // servo
   pinMode(PB3, OUTPUT);
   servo.attach(PB3);
+  servo.writeMicroseconds(PWM_MID_TRIM);
   // sensor
   pinMode(PB2, INPUT_PULLUP); // sensor
 }
@@ -168,7 +172,7 @@ void loop() {
   #endif
   
   // command servo
-  mix += TRIM;
-  mix = constrain(mix, -PWM_CHANGE, PWM_CHANGE);
-  servo.writeMicroseconds( PWM_MID + mix );    
+  mix = constrain(mix,-PWM_CHANGE, PWM_CHANGE);
+  
+  servo.writeMicroseconds( PWM_MID_TRIM + mix );    
 }

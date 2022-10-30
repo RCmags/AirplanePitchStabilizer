@@ -12,15 +12,16 @@
 // Pin 9 -> Receiver CH2
 // Pin A7 -> Analog sensor
   // Outputs:
-// Pin 6  -> Left  wing servo
-// Pin 7  -> Right wing servo 
+// Pin 2  -> Left  wing servo
+// Pin 3  -> Right wing servo 
 
 //=================== Code ===================
 #include <Servo.h>
 #include "parameters.cpp"
 
 //----- constants
-#define SENSOR_PIN    A7
+constexpr int PWM_MID_L = PWM_MID + TRIM_LEFT;
+constexpr int PWM_MID_R = PWM_MID - TRIM_RIGHT;
 
 //----- global variables 
 Servo servo[2]; 
@@ -146,10 +147,13 @@ float PIDcontroller(float input) {
 //----- Servos
 
 void setupServos() {    
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-  servo[0].attach(6);
-  servo[1].attach(7);
+  pinMode(PIN_SERVO_LEFT, OUTPUT);
+  pinMode(PIN_SERVO_RIGHT, OUTPUT);
+  servo[0].attach(PIN_SERVO_LEFT);
+  servo[1].attach(PIN_SERVO_RIGHT);
+  // default position
+  servo[0].writeMicroseconds(PWM_MID_L);
+  servo[1].writeMicroseconds(PWM_MID_R);
 }
 
 //----- Main loop
@@ -165,21 +169,18 @@ void loop() {
   float input[2]; scaleInputs(input);
   
   #ifdef USING_MANUAL_CONTROL
-    float output = -input[1];                  // directly use rx input
+    float output = input[1];                    // directly use rx input
   #else
-    float output = PIDcontroller( input[1] );  // pitch input controls target AoA
+    float output = PIDcontroller( -input[1] );  // pitch input controls target AoA
   #endif
   
   float mix1 = input[0] + output;
   float mix2 = input[0] - output;
   
-  // command servos
-  mix1 += PWM_MID + TRIM_LEFT;
-  mix2 += PWM_MID + TRIM_RIGHT;
-  
-  mix1 = constrain(mix1, PWM_MIN, PWM_MAX);
-  mix2 = constrain(mix2, PWM_MIN, PWM_MAX);
+  // command servos  
+  mix1 = constrain(mix1,-PWM_CHANGE, PWM_CHANGE);
+  mix2 = constrain(mix2,-PWM_CHANGE, PWM_CHANGE);
 
-  servo[0].writeMicroseconds( mix1 );    // left wing
-  servo[1].writeMicroseconds( mix2 );    // right wing
+  servo[0].writeMicroseconds( PWM_MID_L + mix1 );    // left wing
+  servo[1].writeMicroseconds( PWM_MID_R + mix2 );    // right wing
 }

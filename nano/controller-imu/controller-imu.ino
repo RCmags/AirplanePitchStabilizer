@@ -122,7 +122,7 @@ void filterInputs(float* output) {
 #ifdef USING_WEIGHT_SHIFT
 
 /* gain to maintain constant torque indifferent of wing load */
-float gainAccel(float accel) {
+float gainLift(float accel) {
   return accel == 0 ? 0 : 1/accel;
 }
 #endif
@@ -181,7 +181,7 @@ float PIDcontroller(float input) {
   float output = float(GAIN_INT)*angle + float(GAIN_PROP)*angvel;
 
   #ifdef USING_WEIGHT_SHIFT
-    return output * gainAccel(accel); 
+    return output * gainLift(accel); 
   #else
     return output;
   #endif
@@ -207,8 +207,8 @@ void setupServos() {
   servo[0].attach(PIN_SERVO_LEFT);
   servo[1].attach(PIN_SERVO_RIGHT);
   // default position
-  servo[0].writeMicroseconds(PWM_MID + TRIM_LEFT);
-  servo[1].writeMicroseconds(PWM_MID + TRIM_RIGHT);
+  servo[0].writeMicroseconds(PWM_MID_L);
+  servo[1].writeMicroseconds(PWM_MID_R);
 }
 
 //----- Main loop
