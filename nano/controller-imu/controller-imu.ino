@@ -25,20 +25,12 @@
 
 //=================== Code ===================
 #include <Servo.h>
-#include "imu.cpp"
-#include "parameters.cpp"
+#include "parameters.h"
+#include "imu.h"
 
 //----- constants
-  // servos:
-#define PIN_SERVO_LEFT    2
-#define PIN_SERVO_RIGHT   3
-
 constexpr int PWM_MID_L = PWM_MID + TRIM_LEFT;
 constexpr int PWM_MID_R = PWM_MID + TRIM_RIGHT;
-
-  // Angular rate:
-#define NUMBER_MEAN       50      // number of readings used for calibration mean
-#define GRAVITY           9.81    // acceleration due to gravity [m/s^2]
 
 constexpr float ANGVEL_SCALE = GRAVITY / VELOCITY;   
 constexpr float ANGVEL_MIN   = (ACCEL_MIN - 1) * ANGVEL_SCALE;
@@ -111,15 +103,19 @@ void filterInputs(float* output) {
   static int* pwm_mean = calibrateInputs();
   static int filter[2] = {0};  
   
-  // apply deadband filter
   for( uint8_t index = 0; index < 2; index += 1 ) {
+    // remove noise
     int input = int( pwm_input[index] );
     int change = input - filter[index]; 
     filter[index] += deadband(change, -INPUT_CHANGE, INPUT_CHANGE);
+
+    // center output
+    output[index] = filter[index] - pwm_mean[index];
+    output[index] = deadband( output[index], -INPUT_DEADBAND, INPUT_DEADBAND);
   }
-  // scale and center inputs
-  output[0] = float( filter[0] - pwm_mean[0] )*GAIN_ROLL;    // roll
-  output[1] = float( filter[1] - pwm_mean[1] )*GAIN_PITCH;   // pitch
+  // scale output
+  output[0] *= float(GAIN_ROLL);    // roll
+  output[1] *= float(GAIN_PITCH);   // pitch
 }
 
 //----- PID controller
@@ -154,10 +150,7 @@ float integral(float input) {
 }
 
 /* limit wing loading */
-float restrictRate(float input, float accel) {
-  // prevent integrator drift
-  input = deadband(input, -INPUT_DEADBAND, INPUT_DEADBAND);
-  
+float restrictRate(float input, float accel) {  
   // limit target angular velocity
   constexpr float SCALE = (150 * DEG_TO_RAD) / 500.0;     // Convert 500 ms to 150 deg/s
   input *= SCALE;
@@ -181,7 +174,7 @@ float PIDcontroller(float input) {
     angvel_m = -angvel_m;
   #endif
  
-  // controller
+  // controller  
   float angvel_t = restrictRate(input, accel);
   float angvel = angvel_m - angvel_t;     
   float angle = integral(angvel);
@@ -195,8 +188,20 @@ float PIDcontroller(float input) {
   #endif
 }
 
-//----- Servos
+/* bias controls to self upright */
+void autoLevel(float* input) { 
+    // horizontal angles
+    vec3_t zvec = fusion.getZaxis(LOCAL_FRAME);
+    float angle_y = atan2(zvec.x, zvec.z);
+    float angle_x = atan2(zvec.y, zvec.z); 
+    
+    // control rates
+    constexpr float ANGLE = ANGLE_TRIM * DEG_TO_RAD;
+    input[1] += float(GAIN_ANG_PITCH) * (angle_x - ANGLE);   // pitch
+    input[0] += float(GAIN_ANG_ROLL) * angle_y;              // roll
+}
 
+//----- Servos
 void setupServos() {    
   pinMode(PIN_SERVO_LEFT, OUTPUT);
   pinMode(PIN_SERVO_RIGHT, OUTPUT);
@@ -212,21 +217,31 @@ void setupServos() {
 void setup() {
   setupISR();
   setupServos();
-  // sensors
-  imu.setup();
-  imu.setBias();
+  
+  #ifndef USING_MANUAL_CONTROL 
+    imu.setup();  // use sensor 
+    imu.setBias();
+    setupFusion();
+  #endif
 }
 
 void loop() {
   // update gyro calibration 
   imu.updateBias();
-  
+  updateFusion();
+
   // combine inputs
   float input[2]; filterInputs(input);
+
+  #ifndef USING_MANUAL_CONTROL
+    #ifdef USING_AUTO_LEVEL
+      autoLevel(input);   
+    #endif
+    input[1] = PIDcontroller( -input[1] );
+  #endif
   
-  float output = PIDcontroller( -input[1] );  
-  float mix1 = input[0] + output;
-  float mix2 = input[0] - output;
+  float mix1 = input[0] + input[1];
+  float mix2 = input[0] - input[1];
   
   // command servos  
   mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE );
