@@ -3,32 +3,32 @@
 //                  1. Control inputs 
 //----------------------------------------------------------
 #define GAIN_PITCH        1.0                 // Change in target angle of attack due pitch commands. 
-#define GAIN_ROLL        -0.75                // Asymmetric sweep, CH1
+#define GAIN_ROLL        -0.9                 // Asymmetric sweep, CH1
 
 //----------------------------------------------------------
 //                  2. Servo trims
 //----------------------------------------------------------
-#define TRIM_LEFT         0       // us       // left  wing 
-#define TRIM_RIGHT        0       // us       // right wing
+#define TRIM_LEFT         120      // us       // left  wing 
+#define TRIM_RIGHT        0        // us       // right wing
 
 //----------------------------------------------------------
 //                  3. Output PWM signal
 //----------------------------------------------------------
 #define PWM_MID           1500    // us       // Center/middle servo position
-#define PWM_CHANGE        600     // us       // Maximum change in servo position
+#define PWM_CHANGE        750     // us       // Maximum change in servo position
 
 //----------------------------------------------------------
 //                  4. Pitch Stabilization
 //----------------------------------------------------------
   // I. PID Controller [negate to reverse]                       
-#define GAIN_INT          1400.0              // Integral gain. Adjusts spring response
-#define GAIN_PROP         800.0               // Proportional gain. Adjusts damping response
-#define ANGLE_MAX         25      // deg      // Angle at which integral term saturates
+#define GAIN_INT          1200.0              // Integral gain. Adjusts spring response
+#define GAIN_PROP         1100.0               // Proportional gain. Adjusts damping response
+#define ANGLE_MAX         30      // deg      // Angle at which integral term saturates
   
   // II. Self levelling
-#define GAIN_ANG_ROLL     100                 // Gain to set roll input to self-level aircraft
+#define GAIN_ANG_ROLL     200                 // Gain to set roll input to self-level aircraft
 #define GAIN_ANG_PITCH   -180                 // Gain to set pitch rate to self-level aircraft 
-#define ANGLE_TRIM       -9.5     // deg      // target flight angle relative to horizon
+#define ANGLE_TRIM       -8.0     // deg      // target flight angle relative to horizon
   
   // III. Maximum control rates                          
 #define ACCEL_MIN         0.1     // g-force  // Minimum allowable wing load. Seen at max down elevator
