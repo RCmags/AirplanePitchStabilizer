@@ -10,7 +10,7 @@ The attitude of an airplane is mainly determined by the aerodynamic forces actin
 The simplest angle-of-attack sensor is a [low-friction potentiometer attached to a weathervane](https://www.ilmailu.org/forum/index.php?action=dlattach;topic=5147.0;attach=10336). 
 
 <p align="center"> 
-<img src = "/images/example/aoa-sensor.JPG" width = "80%" height = "80%">
+<img src = "/images/example/aoa-sensor/aoa-sensor.JPG" width = "80%" height = "80%">
 </p>
 
 As the weathervane will closely follow the local airflow, the deflection of the weathervane relative to some reference angle becomes proportional to the angle of attack.
