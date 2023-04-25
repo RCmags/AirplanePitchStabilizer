@@ -9,6 +9,10 @@ The attitude of an airplane is mainly determined by the aerodynamic forces actin
 
 The simplest angle-of-attack sensor is a [low-friction potentiometer attached to a weathervane](https://www.ilmailu.org/forum/index.php?action=dlattach;topic=5147.0;attach=10336). As the weathervane will closely follow the local airflow, the deflection of the weathervane relative to some reference angle becomes proportional to the angle of attack.
 
+<p align="center"> 
+<img src = "/images/examples/aoa-sensor.JPG" width = "80%" height = "80%">
+</p>
+
 __Inertial measurement unit (IMU)__: 
 One can maintain the attitude of the aircraft by measuring its change in orientation and providing an appropriate correction. In this case, we use the angular velocity of a gyroscope as the proportional term in a PID controller. The integral term becomes the angular deflection and is approximately equal to the angle of attack for small external disturbances. Therefore, we can approximate the behaviour obtained wih an angle of attack sensor without having to use an external weathervane.  
 
