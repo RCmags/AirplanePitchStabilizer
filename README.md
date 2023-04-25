@@ -81,8 +81,8 @@ The IMU version of the sketch requires the following libraries:
 ## References
 See these pages for previous projects that inspired this work:
 
-- [Actively stabilized pitch axis](http://www.charlesriverrc.org/articles/asfwpp/lelke_activepitch.htm)
-- [Actively stabilized glider](https://www.youtube.com/watch?v=JfKrUbJYk74)
+- [Active flying wing pitch stabilizer concept](http://www.charlesriverrc.org/articles/asfwpp/lelke_activepitch.htm)
+- [Unstable Tailless Demonstrator - video](https://www.youtube.com/watch?v=JfKrUbJYk74)
 
 ## Examples
 
