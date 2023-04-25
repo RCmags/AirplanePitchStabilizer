@@ -83,7 +83,8 @@ See these pages for previous projects that inspired this work:
 - [Actively stabilized glider](https://www.youtube.com/watch?v=JfKrUbJYk74)
 
 ## Examples
-Here's the airplane this code was originally written for:
+
+- Airplane with an aft C.M. that is controlled by trailing edge flaps: 
 
 <p align="center">
 <img src = "/images/example/aoa-sensor/side.JPG" width = "30%" height = "30%">
@@ -91,7 +92,9 @@ Here's the airplane this code was originally written for:
 <img src = "/images/example/aoa-sensor/bottom.JPG" width = "30%" height = "30%">
 </p>
 
-Another model was built to demonstrate weight shift control:
+
+- Airplane that is stabilized and controlled by shifting its weight: 
+
 <p align="center">
 <img src = "/images/example/imu/side.JPG" width = "30%" height = "30%">
 <img src = "/images/example/imu/front.JPG" width = "30%" height = "30%"> 
