@@ -1,4 +1,4 @@
-# Pitch-axis stabilizer for airplane
+# Pitch-axis stabilizer for airplane :airplane:
 This Arduino sketch is a servo controller for a tail-less RC airplane that is stabilized about the pitch-axis. If tuned correctly, It may increase the lift-to-drag ratio of an aircraft that otherwise depends solely on passive stability.  
 
 ## Concept
