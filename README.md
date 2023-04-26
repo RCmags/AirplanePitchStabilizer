@@ -73,10 +73,12 @@ __DigiSpark ATTiny85__: The version of the sketch does not have the option for a
 </p>
 
 ## Dependencies
-The IMU version of the sketch requires the following libraries:
+The IMU version of the code requires the following libraries:
 
 - [basicMPU6050](https://github.com/RCmags/basicMPU6050)
 - [imuFilter](https://github.com/RCmags/imuFilter)
+
+The ATTiny code requires [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore) to compile. 
 
 ## References
 See these pages for previous projects that inspired this work:
