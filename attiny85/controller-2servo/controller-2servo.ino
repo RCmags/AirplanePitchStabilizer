@@ -188,13 +188,17 @@ void loop() {
   #else
     float output = PIDcontroller( -input[1] );  // pitch input controls target AoA
   #endif
-  
+
+  // limit
+  output = constrain(output, -PWM_CHANGE_PITCH, PWM_CHANGE_PITCH); 
+
+  // mix
   float mix1 = input[0] + output; 
   float mix2 = input[0] - output;
   
   // command servo  
-  mix1 = constrain(mix1,-PWM_CHANGE, PWM_CHANGE);
-  mix2 = constrain(mix2,-PWM_CHANGE, PWM_CHANGE)*GAIN_CORRECTION;
+  mix1 = constrain(mix1, -PWM_CHANGE, PWM_CHANGE);
+  mix2 = constrain(mix2, -PWM_CHANGE, PWM_CHANGE) * GAIN_CORRECTION;
 
   servo[0].writeMicroseconds( PWM_MID_L + mix1 );    // left wing
   servo[1].writeMicroseconds( PWM_MID_R + mix2 );    // right wing 

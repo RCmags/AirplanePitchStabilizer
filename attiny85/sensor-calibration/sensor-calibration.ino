@@ -16,13 +16,13 @@
 // --- Parameters ---- 
 /* Copy these values into the parameters file of the flight controller */
            
-#define ANALOG_MAX        410     // Maximum target reading. Measure and record the sensor angle at this value
-#define ANALOG_MIN        90      // Minimum target reading. Measure and record the sensor angle at this value 
-#define ANALOG_DIFF       5       // Allowable error at middle position
-#define ANALOG_OFFSET    -70      // Bias to make the sensor read zero at the wing's zero-lift angle of attack
+#define ANALOG_MAX        370     // Maximum target reading. Measure and record the sensor angle at this value
+#define ANALOG_MIN        95      // Minimum target reading. Measure and record the sensor angle at this value 
+#define ANALOG_DIFF       10       // Allowable error at middle position
+#define ANALOG_OFFSET     0      // Bias to make the sensor read zero at the wing's zero-lift angle of attack
 
 // depedant constants
-constexpr int ANALOG_MID = 0.5*(ANALOG_MAX + ANALOG_MIN) + OFFSET;
+constexpr int ANALOG_MID = 0.5*(ANALOG_MAX + ANALOG_MIN) + ANALOG_OFFSET;
 constexpr int ANALOG_MID_P = ANALOG_MID + ANALOG_DIFF;
 constexpr int ANALOG_MID_N = ANALOG_MID - ANALOG_DIFF; 
 
